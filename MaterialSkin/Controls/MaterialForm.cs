@@ -11,6 +11,7 @@ namespace MaterialSkin.Controls
 {
     public class MaterialForm : Form, IMaterialControl
     {
+
         [Browsable(false)]
         public int Depth { get; set; }
         [Browsable(false)]
@@ -341,6 +342,7 @@ namespace MaterialSkin.Controls
 
         private void UpdateButtons(MouseEventArgs e, bool up = false)
         {
+
             if (DesignMode) return;
             var oldState = _buttonState;
             bool showMin = MinimizeBox && ControlBox;
@@ -388,12 +390,27 @@ namespace MaterialSkin.Controls
                     _buttonState = ButtonState.XOver;
 
                     if (oldState == ButtonState.XDown && up)
-                        Close();
+                    {
+                        //Create timer and start it 
+                        Timer formClose = new Timer();
+                        formClose.Interval = 1;
+                        formClose.Tick += new EventHandler(formClose_Tick);
+                        formClose.Enabled = !formClose.Enabled;
+                    }
                 }
                 else _buttonState = ButtonState.None;
             }
 
             if (oldState != _buttonState) Invalidate();
+        }
+
+        private void formClose_Tick(object sender, EventArgs e)
+        {
+            //Close form with disappearing animation
+            if (this.Opacity > 0)
+                this.Opacity -= 0.2;
+            else
+                Close();
         }
 
         private void MaximizeWindow(bool maximize)
